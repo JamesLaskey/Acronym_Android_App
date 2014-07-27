@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Acronym</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_acronym_detail_view">AcronymDetailView</string>
+    <string name="action_create_acronym">Create Acronym</string>
+    <string name="title_activity_create_acronym">CreateAcronym</string>
+    <string name="create_desc_hint">Enter a description!</string>
+    <string name="create_new_letter">Add a new word to the acronym</string>
+    <string name="create_new_word_hint">Enter new word</string>
+    <string name="create_word_destroy">Remove</string>
+
+</resources>
