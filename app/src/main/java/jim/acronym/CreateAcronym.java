@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,80 +20,33 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import jim.acronym.R;
 
 public class CreateAcronym extends Activity {
 
-    private ArrayList<String> words;
+    private LinkedList<Word> words;
     private ListView wordList;
-    private ArrayAdapter<String> acrAdapter;
+    private CreateListViewAdapter acrAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        words = new LinkedList<Word>();
+        if(savedInstanceState != null) {
+            Parcelable[] parsedWords = savedInstanceState.getParcelableArray("words");
+            for(Parcelable pword : parsedWords) {
+                words.push((Word) pword);
+                System.out.print("reconstituting words list" + words.toString());
+            }
+        }
+
         setContentView(R.layout.activity_create_acronym);
 
-        //setup wordlist and add rearrange listener
-        words = new ArrayList<String>(4);
         wordList = (ListView) findViewById(R.id.create_acr_list);
-        acrAdapter = new ArrayAdapter<String>(this, R.layout.acr_create_list_item, words){
-
-            @Override
-            public View getView(final int i, View convertView, ViewGroup parent) {
-                LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View rowView = inflater.inflate(R.layout.acr_create_list_item, parent, false);
-
-                TextView letter = (TextView) rowView.findViewById(R.id.acrCreateListLetter);
-                TextView word = (TextView) rowView.findViewById(R.id.acrCreateListWord);
-                Button button = (Button) rowView.findViewById(R.id.acrCreateRemoveBtn);
-
-                //remove button click listener to remove words from the acronym
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        words.remove(i);
-                        acrAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                //set the first letter and word for the acronym
-                letter.setText(words.get(i).charAt(0));
-                word.setText(words.get(i));
-                rowView.setTag(i);
-
-                //enter motion event and create a shadow view for dragging
-                rowView.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View view, MotionEvent motionEvent) {
-                        if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                            View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-                            view.startDrag(ClipData.newPlainText("",""), shadowBuilder, view, 0);
-                            view.setVisibility(View.INVISIBLE);
-                            return true;
-                        }else {
-                            return false;
-                        }
-                    }
-                });
-
-                rowView.setOnDragListener(new View.OnDragListener() {
-                    //not implemented
-                    @Override
-                    public boolean onDrag(View view, DragEvent dragEvent) {
-                        switch(dragEvent.getAction()) {
-                            case DragEvent.ACTION_DRAG_ENDED:
-                                float pos = dragEvent.getY();
-                                //dragEvent.
-                                break;
-                        }
-                        return false;
-                    }
-                });
-
-                return rowView;
-            }
-        };
+        acrAdapter = new CreateListViewAdapter(this, R.layout.acr_create_list_item, words);
 
         wordList.setAdapter(acrAdapter);
     }
@@ -122,8 +76,21 @@ public class CreateAcronym extends Activity {
         EditText editText = (EditText) findViewById(R.id.create_new_word_edit_text);
         String word = editText.getText().toString();
         if(word != null) {
-            words.add(word);
+            words.add(new Word(word, ""));
             acrAdapter.notifyDataSetChanged();
         }
+        editText.setText("");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedState) {
+        super.onSaveInstanceState(savedState);
+
+        LinkedList<Word> words = acrAdapter.getValues();
+        Parcelable[] parsedWords = new Parcelable[words.size()];
+        for (int i = 0; i < words.size(); i++) {
+            parsedWords[i] = words.pop();
+        }
+        savedState.putParcelableArray("words", parsedWords);
     }
 }

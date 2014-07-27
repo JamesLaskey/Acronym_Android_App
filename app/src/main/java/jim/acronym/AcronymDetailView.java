@@ -24,7 +24,12 @@ public class AcronymDetailView extends Activity {
 
         //fill word part list
         ListView wordList = (ListView) findViewById(R.id.wordList);
-        wordList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, acr.words));
+        String[] simpleWordArr = new String[acr.words.length];
+        //man I miss functional map :(
+        for(int i = 0; i < acr.words.length; i++) {
+            simpleWordArr[i] = acr.words[i].toString();
+        }
+        wordList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, simpleWordArr));
 
         //put in title
         TextView title = (TextView) findViewById(R.id.acronymTitle);

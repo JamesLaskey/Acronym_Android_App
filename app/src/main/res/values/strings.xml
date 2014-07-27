@@ -8,7 +8,7 @@
     <string name="action_create_acronym">Create Acronym</string>
     <string name="title_activity_create_acronym">CreateAcronym</string>
     <string name="create_desc_hint">Enter a description!</string>
-    <string name="create_new_letter">Add a new word to the acronym</string>
+    <string name="create_new_letter">Add word!</string>
     <string name="create_new_word_hint">Enter new word</string>
     <string name="create_word_destroy">Remove</string>
 

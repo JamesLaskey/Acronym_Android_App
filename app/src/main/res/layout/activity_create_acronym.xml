@@ -1,7 +1,8 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="jim.acronym.CreateAcronym">
 
     <EditText
@@ -14,24 +15,31 @@
         android:hint="@string/create_desc_hint"/>
 
     <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/create_acr_list"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:id="@+id/create_new_word_edit_text"
-        android:hint="@string/create_new_word_hint"/>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_marginTop="150dp"
-        android:text="@string/create_new_letter"
-        android:onClick="addWordToAcr"/>
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/create_new_word_edit_text"
+            android:hint="@string/create_new_word_hint"
+            android:layout_weight="2"/>
 
-</RelativeLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_new_letter"
+            android:onClick="addWordToAcr"
+            android:layout_weight="3"/>
+
+        </LinearLayout>
+
+
+</LinearLayout>

@@ -9,10 +9,10 @@ import android.os.Parcelable;
 public class Acronym implements Parcelable{
 
     protected String acronym;
-    protected String[] words;
+    protected Word[] words;
     protected String desc;
 
-    protected Acronym(String acronym, String[] words, String desc){
+    protected Acronym(String acronym, Word[] words, String desc){
         this.acronym = acronym;
         this.words = words;
         this.desc = desc;
@@ -20,8 +20,8 @@ public class Acronym implements Parcelable{
 
     public Acronym(Parcel parcel) {
         this.acronym = parcel.readString();
-        words = new String[parcel.readInt()];
-        parcel.readStringArray(words);
+        this.words = new Word[parcel.readInt()];
+        parcel.readTypedArray(words, Word.CREATOR);
         this.desc = parcel.readString();
     }
 
@@ -49,7 +49,7 @@ public class Acronym implements Parcelable{
         int wordsSize = words.length;
         out.writeString(acronym);
         out.writeInt(wordsSize);
-        out.writeStringArray(words);
+        out.writeTypedArray(words,0);
         out.writeString(desc);
     }
 
