@@ -53,8 +53,6 @@ public class AcronymList extends Activity {
     public void fillAcroynmList() {
         //test acronyms
         final ArrayList<Acronym> acrArrayList = new ArrayList<Acronym>();
-        acrArrayList.add(new Acronym("ABT", new String[]{"a","B","T"}, "TEST"));
-        acrArrayList.add(new Acronym("ASDF", new String[]{"a","S","D","F"}, "TEST"));
 
         //get the listview and set its adapter
         ListView list = (ListView) findViewById(R.id.acronymListView);

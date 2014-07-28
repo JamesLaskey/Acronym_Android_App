@@ -51,7 +51,6 @@ public class CreateListViewAdapter extends ArrayAdapter<Word> {
         letter.setText(words.get(i).firstLetter);
         word.setText(words.get(i).word);
         //insert the items position in case I want to pick it up later
-        rowView.setTag(i-1);
 
         //enter motion event and create a shadow view for dragging
         rowView.setOnTouchListener(new View.OnTouchListener() {
@@ -66,55 +65,66 @@ public class CreateListViewAdapter extends ArrayAdapter<Word> {
                     }
                     return true;
                 }else {
+                    view.setVisibility(View.VISIBLE);
                     return false;
                 }
             }
         });
 
         rowView.setOnDragListener(new View.OnDragListener() {
-            //not implemented
+
+            private DragEvent startEvent;
+
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
                 switch(dragEvent.getAction()) {
-                    case DragEvent.ACTION_DROP:
-                        
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        startEvent = dragEvent;
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        float end = dragEvent.getY();
+                        float start = startEvent.getY();
+                        float size = view.getHeight();
+                        int index = i;
+                        int totalElts = words.size();
+                        float change = end - start;
 
+                        System.out.println("change " + change);
+                        System.out.println("start " + start);
+                        System.out.println("pos " + end);
 
-//                        int pos = (int) dragEvent.getY();
-//                        int start = 0;
-//                        int size = view.getHeight();
-//                        int index = (Integer) view.getTag();
-//                        System.out.println("pos " + pos);
-//                        System.out.println(size);
-//
-//                        if(pos < size) {
-//                            System.out.println("i "  + index);
-//                            //should go in as the first word
-//                            words.push(words.get(index));
-//                            words.remove(index + 1);
-//                            notifyContext.notifyDataSetChanged();
-//
-//                            view.setTag(0);
-//                            System.out.println(words.toString());
-//                        }else {
-//                            int count = 1;
-//                            while(pos > start && count < words.size()) {
-//                                start += size;
-//                                count++;
-//                            }
-//
-//                            System.out.println("start " + start);
-//
-//                            words.add(count, words.get(index));
-//                            if(count > index) {
-//                                words.remove(index);
-//                            }else {
-//                                words.remove(index + 1);
-//                            }
-//
-//                            view.setTag(count);
-//                            notifyContext.notifyDataSetChanged();
-//                        }
+                        if(change > size/2) {
+                            change = change - size /2;
+                            int posToMove = Math.round(change/size);
+                            if(posToMove > totalElts - i){
+                                posToMove = totalElts - 1;
+                            }else {
+                                posToMove = i + posToMove;
+                            }
+
+                            System.out.println("positive " + posToMove);
+                            Word word = words.remove(i);
+                            words.add(posToMove, word);
+                            notifyContext.notifyDataSetChanged();
+                        }else if(change < -1 *size/2) {
+                            change = change + size /2;
+                            int posToMove = Math.round(change/size);
+                            if(posToMove < 0){
+                                posToMove = 0;
+                            }else {
+                                posToMove = i + posToMove;
+                            }
+
+                            System.out.println(posToMove);
+                            Word word = words.remove(i);
+                            words.add(posToMove, word);
+                            notifyContext.notifyDataSetChanged();
+                        }
+
+                        view.setVisibility(View.VISIBLE);
+                        break;
+                    case DragEvent.ACTION_DRAG_EXITED:
+                        view.setVisibility(View.VISIBLE);
                         break;
                 }
                 view.setVisibility(View.VISIBLE);

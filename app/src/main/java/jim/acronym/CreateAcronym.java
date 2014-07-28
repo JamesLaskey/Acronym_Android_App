@@ -49,6 +49,12 @@ public class CreateAcronym extends Activity {
         acrAdapter = new CreateListViewAdapter(this, R.layout.acr_create_list_item, words);
 
         wordList.setAdapter(acrAdapter);
+
+        words.push(new Word("A", ""));
+        words.push(new Word("B", ""));
+        words.push(new Word("C", ""));
+
+        acrAdapter.notifyDataSetChanged();
     }
 
 
