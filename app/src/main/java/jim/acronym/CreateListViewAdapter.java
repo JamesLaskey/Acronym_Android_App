@@ -77,41 +77,44 @@ public class CreateListViewAdapter extends ArrayAdapter<Word> {
             public boolean onDrag(View view, DragEvent dragEvent) {
                 switch(dragEvent.getAction()) {
                     case DragEvent.ACTION_DROP:
-                        int pos = (int) dragEvent.getY();
-                        int start = 0;
-                        int size = view.getHeight();
-                        int index = (Integer) view.getTag();
-                        System.out.println("pos " + pos);
-                        System.out.println(size);
+                        
 
-                        if(pos < size) {
-                            System.out.println("i "  + index);
-                            //should go in as the first word
-                            words.push(words.get(index));
-                            words.remove(index + 1);
-                            notifyContext.notifyDataSetChanged();
 
-                            view.setTag(0);
-                            System.out.println(words.toString());
-                        }else {
-                            int count = 1;
-                            while(pos > start && count < words.size()) {
-                                start += size;
-                                count++;
-                            }
-
-                            System.out.println("start " + start);
-
-                            words.add(count, words.get(index));
-                            if(count > index) {
-                                words.remove(index);
-                            }else {
-                                words.remove(index + 1);
-                            }
-
-                            view.setTag(count);
-                            notifyContext.notifyDataSetChanged();
-                        }
+//                        int pos = (int) dragEvent.getY();
+//                        int start = 0;
+//                        int size = view.getHeight();
+//                        int index = (Integer) view.getTag();
+//                        System.out.println("pos " + pos);
+//                        System.out.println(size);
+//
+//                        if(pos < size) {
+//                            System.out.println("i "  + index);
+//                            //should go in as the first word
+//                            words.push(words.get(index));
+//                            words.remove(index + 1);
+//                            notifyContext.notifyDataSetChanged();
+//
+//                            view.setTag(0);
+//                            System.out.println(words.toString());
+//                        }else {
+//                            int count = 1;
+//                            while(pos > start && count < words.size()) {
+//                                start += size;
+//                                count++;
+//                            }
+//
+//                            System.out.println("start " + start);
+//
+//                            words.add(count, words.get(index));
+//                            if(count > index) {
+//                                words.remove(index);
+//                            }else {
+//                                words.remove(index + 1);
+//                            }
+//
+//                            view.setTag(count);
+//                            notifyContext.notifyDataSetChanged();
+//                        }
                         break;
                 }
                 view.setVisibility(View.VISIBLE);
