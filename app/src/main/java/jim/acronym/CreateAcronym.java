@@ -78,7 +78,8 @@ public class CreateAcronym extends Activity {
     private boolean saveAcronym() {
         AcronymDatabase dbHelper = new AcronymDatabase(this);
 
-        Word[] wordArr = (Word[]) words.toArray();
+        Word[] wordArr = new Word[words.size()];
+        words.toArray(wordArr);
         String acronym = "";
         for(int i = 0; i < wordArr.length; i++){
             acronym = acronym + wordArr[i].firstLetter;

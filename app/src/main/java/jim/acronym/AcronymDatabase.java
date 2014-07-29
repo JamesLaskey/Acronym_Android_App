@@ -6,7 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by jim on 7/27/14.
@@ -145,18 +147,52 @@ public class AcronymDatabase extends SQLiteOpenHelper {
      */
     public Word[] getWordsFromAcr(String acr) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(BINDINGS_TABLE_NAME, null, BINDINGS_TABLE_FOREIGN_KEY_ACRONYM + "=" + acr, null, null, null, null);
+        Cursor acrCursor = db.query(ACRONYM_TABLE_NAME, null, ACRONYM_TABLE_KEY_ACRONYM + "=" + acr, null, null, null, null);
+        acrCursor.moveToNext();
+        int acrID = acrCursor.getInt(0);
+
+        Cursor bindingCursor = db.query(BINDINGS_TABLE_NAME, null, BINDINGS_TABLE_FOREIGN_KEY_ACRONYM + "=" + acrID, null, null, null, null);
+        bindingCursor.moveToNext();
 
         ArrayList<Word> words = new ArrayList<Word>();
 
-        for(int i = 0; i < cursor.getCount(); i++) {
-            Cursor wordCursor = db.query(WORD_TABLE_NAME, null, WORD_TABLE_KEY_ID + "=" + cursor.getInt(2), null, null, null, null);
+        for(int i = 0; i < bindingCursor.getCount(); i++) {
+            Cursor wordCursor = db.query(WORD_TABLE_NAME, null, WORD_TABLE_KEY_ID + "=" + bindingCursor.getInt(2), null, null, null, null);
+            wordCursor.moveToNext();
             Word word = new Word(wordCursor.getString(1), wordCursor.getString(2), wordCursor.getString(3));
             words.add(word);
-            cursor.moveToNext();
+            bindingCursor.moveToNext();
         }
 
-        return (Word[]) words.toArray();
+        Word[] ret = new Word[words.size()];
+        words.toArray(ret);
+        return ret;
+    }
+
+    /**
+     * given the string acronym, recovers all words associated with that acronym
+     * @param acrID the id of the acronym to be used to recover the Words
+     * @return an array of Words that are associated with acr, or null if an error occurred
+     */
+    public Word[] getWordsFromAcr(int acrID) {
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor bindingCursor = db.query(BINDINGS_TABLE_NAME, null, BINDINGS_TABLE_FOREIGN_KEY_ACRONYM + "=" + acrID, null, null, null, null);
+        bindingCursor.moveToNext();
+
+        ArrayList<Word> words = new ArrayList<Word>();
+
+        for(int i = 0; i < bindingCursor.getCount(); i++) {
+            Cursor wordCursor = db.query(WORD_TABLE_NAME, null, WORD_TABLE_KEY_ID + "=" + bindingCursor.getInt(2), null, null, null, null);
+            wordCursor.moveToNext();
+            Word word = new Word(wordCursor.getString(1), wordCursor.getString(2), wordCursor.getString(3));
+            words.add(word);
+            bindingCursor.moveToNext();
+        }
+
+        Word[] ret = new Word[words.size()];
+        words.toArray(ret);
+        return ret;
     }
 
 
@@ -190,15 +226,16 @@ public class AcronymDatabase extends SQLiteOpenHelper {
     public ArrayList<Acronym> getAllAcronyms(int offset, int limit) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(ACRONYM_TABLE_NAME, null, ACRONYM_TABLE_KEY_ID + " > " + offset, null, null, null, ACRONYM_TABLE_KEY_ACRONYM + " ASC", "" + limit);
-
+        cursor.moveToNext();
         ArrayList<Acronym> acronyms = new ArrayList<Acronym>();
         for(int i = 0; i < cursor.getCount(); i++) {
-            Word[] words = getWordsFromAcr(cursor.getString(1));
+            Word[] words = getWordsFromAcr(cursor.getInt(0));
             acronyms.add(new Acronym(cursor.getString(1), words, cursor.getString(2)));
             cursor.moveToNext();
         }
 
-        lastAcronymIDOffsetRead = cursor.getInt(0);
+        cursor.moveToLast();
+        //lastAcronymIDOffsetRead = cursor.getInt(0);
         return acronyms;
     }
 

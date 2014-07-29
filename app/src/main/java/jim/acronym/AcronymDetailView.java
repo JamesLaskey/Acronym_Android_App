@@ -1,9 +1,13 @@
 package jim.acronym;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,12 +28,23 @@ public class AcronymDetailView extends Activity {
 
         //fill word part list
         ListView wordList = (ListView) findViewById(R.id.wordList);
-        String[] simpleWordArr = new String[acr.words.length];
-        //man I miss functional map :(
-        for(int i = 0; i < acr.words.length; i++) {
-            simpleWordArr[i] = acr.words[i].toString();
-        }
-        wordList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, simpleWordArr));
+        final String[] simpleWordArr = new String[acr.words.length];
+        //until I make a separate class for this arrayAdapter simpleWordArr is hacky workaround
+        wordList.setAdapter(new ArrayAdapter<String>(this, R.layout.word_list_item, simpleWordArr){
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View rowView = inflater.inflate(R.layout.word_list_item, parent, false);
+
+                TextView letter = (TextView) rowView.findViewById(R.id.wordListLetter);
+                TextView word = (TextView) rowView.findViewById(R.id.wordListWord);
+
+                letter.setText(acr.words[position].firstLetter);
+                word.setText(acr.words[position].word);
+
+                return rowView;
+            }
+        });
 
         //put in title
         TextView title = (TextView) findViewById(R.id.acronymTitle);
