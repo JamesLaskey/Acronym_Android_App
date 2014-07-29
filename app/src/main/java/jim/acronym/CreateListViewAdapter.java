@@ -2,6 +2,7 @@ package jim.acronym;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,12 +22,14 @@ import java.util.LinkedList;
 public class CreateListViewAdapter extends ArrayAdapter<Word> {
 
     private LinkedList<Word> words;
+    private ListView listview;
     private Context context;
 
-    public CreateListViewAdapter(Context context, int list_item_layout, LinkedList<Word> words) {
+    public CreateListViewAdapter(Context context, int list_item_layout, LinkedList<Word> words, ListView listview) {
         super(context, list_item_layout, words);
         this.words = words;
         this.context = context;
+        this.listview = listview;
     }
 
     @Override
@@ -53,84 +57,46 @@ public class CreateListViewAdapter extends ArrayAdapter<Word> {
         //insert the items position in case I want to pick it up later
 
         //enter motion event and create a shadow view for dragging
-        rowView.setOnTouchListener(new View.OnTouchListener() {
+        rowView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-                    boolean success = view.startDrag(ClipData.newPlainText("", ""), shadowBuilder, view, 0);
-                    view.setVisibility(View.INVISIBLE);
-                    if(!success) {
-                        view.setVisibility(View.VISIBLE);
-                    }
-                    return true;
-                }else {
+            public boolean onLongClick(View view) {
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                boolean success = view.startDrag(ClipData.newPlainText("", ""), shadowBuilder, view, 0);
+                view.setVisibility(View.INVISIBLE);
+                if(!success) {
                     view.setVisibility(View.VISIBLE);
-                    return false;
                 }
-            }
-        });
 
-        rowView.setOnDragListener(new View.OnDragListener() {
+                for(int j = 0; j < words.size(); j++) {
+                    listview.getChildAt(j).setOnDragListener(new View.OnDragListener() {
+                        @Override
+                        public boolean onDrag(View view, DragEvent dragEvent) {
+                            switch(dragEvent.getAction()) {
+                                case DragEvent.ACTION_DRAG_ENTERED:
+                                    view.setBackgroundColor(Color.MAGENTA);
+                                    break;
+                                case DragEvent.ACTION_DROP:
+                                    int pos = (Integer) view.getTag();
+                                    Word word = words.remove(i);
+                                    words.add(pos, word);
 
-            private DragEvent startEvent;
-
-            @Override
-            public boolean onDrag(View view, DragEvent dragEvent) {
-                switch(dragEvent.getAction()) {
-                    case DragEvent.ACTION_DRAG_STARTED:
-                        startEvent = dragEvent;
-                        break;
-                    case DragEvent.ACTION_DRAG_ENDED:
-                        float end = dragEvent.getY();
-                        float start = startEvent.getY();
-                        float size = view.getHeight();
-                        int index = i;
-                        int totalElts = words.size();
-                        float change = end - start;
-
-                        System.out.println("change " + change);
-                        System.out.println("start " + start);
-                        System.out.println("pos " + end);
-
-                        if(change > size/2) {
-                            change = change - size /2;
-                            int posToMove = Math.round(change/size);
-                            if(posToMove > totalElts - i){
-                                posToMove = totalElts - 1;
-                            }else {
-                                posToMove = i + posToMove;
+                                    view.setVisibility(View.VISIBLE);
+                                    notifyContext.notifyDataSetChanged();
+                                    break;
+                                case DragEvent.ACTION_DRAG_EXITED:
+                                    view.setBackgroundColor(Color.WHITE);
+                                    break;
                             }
-
-                            System.out.println("positive " + posToMove);
-                            Word word = words.remove(i);
-                            words.add(posToMove, word);
-                            notifyContext.notifyDataSetChanged();
-                        }else if(change < -1 *size/2) {
-                            change = change + size /2;
-                            int posToMove = Math.round(change/size);
-                            if(posToMove < 0){
-                                posToMove = 0;
-                            }else {
-                                posToMove = i + posToMove;
-                            }
-
-                            System.out.println(posToMove);
-                            Word word = words.remove(i);
-                            words.add(posToMove, word);
-                            notifyContext.notifyDataSetChanged();
+                            return true;
                         }
-
-                        view.setVisibility(View.VISIBLE);
-                        break;
-                    case DragEvent.ACTION_DRAG_EXITED:
-                        view.setVisibility(View.VISIBLE);
-                        break;
+                    });
                 }
-                view.setVisibility(View.VISIBLE);
+
                 return true;
             }
         });
+
+        rowView.setTag(i);
 
         return rowView;
     }

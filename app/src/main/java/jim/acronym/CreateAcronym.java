@@ -46,7 +46,7 @@ public class CreateAcronym extends Activity {
         setContentView(R.layout.activity_create_acronym);
 
         wordList = (ListView) findViewById(R.id.create_acr_list);
-        acrAdapter = new CreateListViewAdapter(this, R.layout.acr_create_list_item, words);
+        acrAdapter = new CreateListViewAdapter(this, R.layout.acr_create_list_item, words, wordList);
 
         wordList.setAdapter(acrAdapter);
 
