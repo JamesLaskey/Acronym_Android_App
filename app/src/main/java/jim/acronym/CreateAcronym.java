@@ -50,10 +50,6 @@ public class CreateAcronym extends Activity {
 
         wordList.setAdapter(acrAdapter);
 
-        words.push(new Word("A", ""));
-        words.push(new Word("B", ""));
-        words.push(new Word("C", ""));
-
         acrAdapter.notifyDataSetChanged();
     }
 
@@ -73,8 +69,24 @@ public class CreateAcronym extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        }else if(id == R.id.action_save) {
+            return saveAcronym();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean saveAcronym() {
+        AcronymDatabase dbHelper = new AcronymDatabase(this);
+
+        Word[] wordArr = (Word[]) words.toArray();
+        String acronym = "";
+        for(int i = 0; i < wordArr.length; i++){
+            acronym = acronym + wordArr[i].firstLetter;
+        }
+
+        String desc = ((TextView) findViewById(R.id.create_acr_desc)).getText().toString();
+        Acronym acr = new Acronym(acronym, wordArr, desc);
+        return dbHelper.insertAcronym(acr) > -1;
     }
 
     //click listener for when user wants to add a word to the acronym
@@ -82,7 +94,7 @@ public class CreateAcronym extends Activity {
         EditText editText = (EditText) findViewById(R.id.create_new_word_edit_text);
         String word = editText.getText().toString();
         if(word != null) {
-            words.add(new Word(word, ""));
+            words.add(new Word(word, (word.charAt(0) + "").toUpperCase(), ""));
             acrAdapter.notifyDataSetChanged();
         }
         editText.setText("");

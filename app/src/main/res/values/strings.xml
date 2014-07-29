@@ -11,5 +11,6 @@
     <string name="create_new_letter">Add word!</string>
     <string name="create_new_word_hint">Enter new word</string>
     <string name="create_word_destroy">Remove</string>
+    <string name="action_create_save">Save</string>
 
 </resources>

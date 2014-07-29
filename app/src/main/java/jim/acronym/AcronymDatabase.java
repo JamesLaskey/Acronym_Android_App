@@ -2,8 +2,11 @@ package jim.acronym;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
 
 /**
  * Created by jim on 7/27/14.
@@ -21,7 +24,7 @@ public class AcronymDatabase extends SQLiteOpenHelper {
     private static final String ACRONYM_TABLE_KEY_ACRONYM = "acr";
     private static final String ACRONYM_TABLE_KEY_DESCRIPTION = "description";
     private static final String ACRONYM_CREATE_TABLE = "CREATE TABLE " + ACRONYM_TABLE_NAME + " (" +
-            ACRONYM_TABLE_KEY_ID + " INTEGER PRIMARY KEY ASC, " +
+            ACRONYM_TABLE_KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             ACRONYM_TABLE_KEY_ACRONYM + " TEXT UNIQUE, " +
             ACRONYM_TABLE_KEY_DESCRIPTION + " TEXT); ";
 
@@ -33,7 +36,7 @@ public class AcronymDatabase extends SQLiteOpenHelper {
     private static final String WORD_TABLE_KEY_DEFINITION = "definition";
     private static final String WORD_TABLE_KEY_FIRST_LETTER = "first_letter";
     private static final String WORD_CREATE_TABLE = "CREATE TABLE " + WORD_TABLE_NAME + " (" +
-            WORD_TABLE_KEY_ID + " INTEGER PRIMARY KEY ASC, " +
+            WORD_TABLE_KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             WORD_TABLE_KEY_WORD + " TEXT UNIQUE, " +
             WORD_TABLE_KEY_FIRST_LETTER + " CHARACTER(1), " +
             WORD_TABLE_KEY_DEFINITION + " TEXT); ";
@@ -45,7 +48,7 @@ public class AcronymDatabase extends SQLiteOpenHelper {
     private static final String BINDINGS_TABLE_FOREIGN_KEY_ACRONYM = "acr";
     private static final String BINDINGS_TABLE_FOREIGN_KEY_WORD = "word";
     private static final String BINDINGS_CREATE_TABLE = "CREATE TABLE " + BINDINGS_TABLE_NAME + " (" +
-            BINDINGS_TABLE_ID + " INTEGER PRIMARY KEY ASC, " +
+            BINDINGS_TABLE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             BINDINGS_TABLE_FOREIGN_KEY_ACRONYM + " INTEGER, " +
             BINDINGS_TABLE_FOREIGN_KEY_WORD + " INTEGER, " +
             "FOREIGN KEY(" + BINDINGS_TABLE_FOREIGN_KEY_ACRONYM +") REFERENCES " +
@@ -89,17 +92,41 @@ public class AcronymDatabase extends SQLiteOpenHelper {
      * @return the id of the inserted row or -1 if an error occurred
      */
     public long insertAcronym(Acronym acr){
-        return -1;
+        ContentValues vals = new ContentValues();
+        vals.put(ACRONYM_TABLE_KEY_ACRONYM, acr.acronym);
+        vals.put(ACRONYM_TABLE_KEY_DESCRIPTION, acr.desc);
+        SQLiteDatabase db = getWritableDatabase();
+        long acronymID = db.insert(ACRONYM_TABLE_NAME, null, vals);
+        if(acronymID == -1) {
+            return -1;
+        }
+
+        for(Word word : acr.words) {
+            long wordID = insertWord(word);
+            if(wordID == -1){
+                return -1;
+            }
+
+            if(makeBinding(acronymID, wordID, db) == -1){
+                return -1;
+            }
+        }
+
+        return acronymID;
     }
 
     /**
      * inserts a binding into the database, this associates a word with an acronym
-     * @param acr the Acronym to be bound to
-     * @param word the Word that will be associated with the acr
-     * @return
+     * @param acrID the id of the Acronym to be bound to
+     * @param wordID the id of the Word that will be associated with the acr
+     * @param db, a db to insert the binding into
+     * @return the id of the Binding
      */
-    public long makeBinding(Acronym acr, Word word) {
-        return -1;
+    public long makeBinding(long acrID, long wordID, SQLiteDatabase db) {
+        ContentValues bVal = new ContentValues();
+        bVal.put(BINDINGS_TABLE_FOREIGN_KEY_ACRONYM, acrID);
+        bVal.put(BINDINGS_TABLE_FOREIGN_KEY_WORD, wordID);
+        return db.insert(BINDINGS_TABLE_NAME, null, bVal);
     }
 
     /**
@@ -117,7 +144,19 @@ public class AcronymDatabase extends SQLiteOpenHelper {
      * @return an array of Words that are associated with acr, or null if an error occurred
      */
     public Word[] getWordsFromAcr(String acr) {
-        return null;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(BINDINGS_TABLE_NAME, null, BINDINGS_TABLE_FOREIGN_KEY_ACRONYM + "=" + acr, null, null, null, null);
+
+        ArrayList<Word> words = new ArrayList<Word>();
+
+        for(int i = 0; i < cursor.getCount(); i++) {
+            Cursor wordCursor = db.query(WORD_TABLE_NAME, null, WORD_TABLE_KEY_ID + "=" + cursor.getInt(2), null, null, null, null);
+            Word word = new Word(wordCursor.getString(1), wordCursor.getString(2), wordCursor.getString(3));
+            words.add(word);
+            cursor.moveToNext();
+        }
+
+        return (Word[]) words.toArray();
     }
 
 
@@ -127,6 +166,7 @@ public class AcronymDatabase extends SQLiteOpenHelper {
      * @return the new Acronym object or null if acr did not match anything
      */
     public Acronym getAcronym(String acr){
+
         return null;
     }
 
@@ -137,5 +177,36 @@ public class AcronymDatabase extends SQLiteOpenHelper {
      */
     public Acronym[] getAcrsFromWord(Word word) {
         return null;
+    }
+
+
+    private int lastAcronymIDOffsetRead = -1;
+    /**
+     * gets limit number of Acronym objects from the database starting from offset
+     * @param offset
+     * @param limit
+     * @return
+     */
+    public ArrayList<Acronym> getAllAcronyms(int offset, int limit) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(ACRONYM_TABLE_NAME, null, ACRONYM_TABLE_KEY_ID + " > " + offset, null, null, null, ACRONYM_TABLE_KEY_ACRONYM + " ASC", "" + limit);
+
+        ArrayList<Acronym> acronyms = new ArrayList<Acronym>();
+        for(int i = 0; i < cursor.getCount(); i++) {
+            Word[] words = getWordsFromAcr(cursor.getString(1));
+            acronyms.add(new Acronym(cursor.getString(1), words, cursor.getString(2)));
+            cursor.moveToNext();
+        }
+
+        lastAcronymIDOffsetRead = cursor.getInt(0);
+        return acronyms;
+    }
+
+    /**
+     * gets the id of the last acronym in the database read off from getAllAcronyms, allowing accurate positioning of offset on future calls
+     * @return id of the last acronym returned by getAllAcronyms()
+     */
+    public int getLastAcronymOffset() {
+        return lastAcronymIDOffsetRead;
     }
 }

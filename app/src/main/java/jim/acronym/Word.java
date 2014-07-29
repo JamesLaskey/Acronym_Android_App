@@ -11,9 +11,9 @@ public class Word implements Parcelable{
     protected String firstLetter;
     protected String definition;
 
-    public Word(String word, String definition) {
+    public Word(String word, String firstLetter, String definition) {
         this.word = word;
-        this.firstLetter = (word.charAt(0) + "").toUpperCase();
+        this.firstLetter = firstLetter;
         this.definition = definition;
     }
 
