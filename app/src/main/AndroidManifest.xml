@@ -21,7 +21,7 @@
             android:label="@string/title_activity_acronym_detail_view" >
         </activity>
         <activity
-            android:name=".CreateAcronym"
+            android:name=".AcronymCreate"
             android:label="@string/title_activity_create_acronym"
             android:parentActivityName=".AcronymList" >
             <meta-data

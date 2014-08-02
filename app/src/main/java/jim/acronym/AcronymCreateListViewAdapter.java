@@ -19,13 +19,13 @@ import java.util.LinkedList;
 /**
  * Created by jim on 7/27/14.
  */
-public class CreateListViewAdapter extends ArrayAdapter<Word> {
+public class AcronymCreateListViewAdapter extends ArrayAdapter<Word> {
 
     private LinkedList<Word> words;
     private ListView listview;
     private Context context;
 
-    public CreateListViewAdapter(Context context, int list_item_layout, LinkedList<Word> words, ListView listview) {
+    public AcronymCreateListViewAdapter(Context context, int list_item_layout, LinkedList<Word> words, ListView listview) {
         super(context, list_item_layout, words);
         this.words = words;
         this.context = context;

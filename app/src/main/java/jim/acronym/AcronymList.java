@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class AcronymList extends Activity {
 
         switch (id) {
             case R.id.action_create_acronym:
-                startActivity(new Intent(this, CreateAcronym.class));
+                startActivity(new Intent(this, AcronymCreate.class));
                 break;
 
             case R.id.action_settings:

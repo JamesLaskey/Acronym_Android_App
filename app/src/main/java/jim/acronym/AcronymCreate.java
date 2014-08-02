@@ -1,34 +1,22 @@
 package jim.acronym;
 
 import android.app.Activity;
-import android.content.ClipData;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.view.DragEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
-import jim.acronym.R;
-
-public class CreateAcronym extends Activity {
+public class AcronymCreate extends Activity {
 
     private LinkedList<Word> words;
     private ListView wordList;
-    private CreateListViewAdapter acrAdapter;
+    private AcronymCreateListViewAdapter acrAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +26,14 @@ public class CreateAcronym extends Activity {
         if(savedInstanceState != null) {
             Parcelable[] parsedWords = savedInstanceState.getParcelableArray("words");
             for(Parcelable pword : parsedWords) {
-                words.push((Word) pword);
-                System.out.print("reconstituting words list" + words.toString());
+                words.addLast((Word) pword);
             }
         }
 
         setContentView(R.layout.activity_create_acronym);
 
         wordList = (ListView) findViewById(R.id.create_acr_list);
-        acrAdapter = new CreateListViewAdapter(this, R.layout.acr_create_list_item, words, wordList);
+        acrAdapter = new AcronymCreateListViewAdapter(this, R.layout.acr_create_list_item, words, wordList);
 
         wordList.setAdapter(acrAdapter);
 
@@ -107,7 +94,8 @@ public class CreateAcronym extends Activity {
 
         LinkedList<Word> words = acrAdapter.getValues();
         Parcelable[] parsedWords = new Parcelable[words.size()];
-        for (int i = 0; i < words.size(); i++) {
+        int size = words.size();
+        for (int i = 0; i < size; i++) {
             parsedWords[i] = words.pop();
         }
         savedState.putParcelableArray("words", parsedWords);
