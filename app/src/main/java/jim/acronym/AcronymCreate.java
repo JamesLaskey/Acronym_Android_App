@@ -83,6 +83,7 @@ public class AcronymCreate extends Activity {
         String word = editText.getText().toString();
         if(word != null) {
             words.add(new Word(word, (word.charAt(0) + "").toUpperCase(), ""));
+            words.getLast().getOnlineDefinition(this);
             acrAdapter.notifyDataSetChanged();
         }
         editText.setText("");

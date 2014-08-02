@@ -43,6 +43,7 @@ public class AcronymList extends Activity {
                 break;
 
             case R.id.action_settings:
+                startActivity(new Intent(this, AcronymSettings.class));
                 break;
         }
         return true;

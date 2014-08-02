@@ -12,5 +12,7 @@
     <string name="create_new_word_hint">Enter new word</string>
     <string name="create_word_destroy">Remove</string>
     <string name="action_create_save">Save</string>
+    <string name="title_activity_acronym_settings">AcronymSettings</string>
+    <string name="settings_api_key_hint">Enter Merriam Webster Api Key</string>
 
 </resources>
