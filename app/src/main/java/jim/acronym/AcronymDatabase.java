@@ -39,7 +39,7 @@ public class AcronymDatabase extends SQLiteOpenHelper {
     private static final String WORD_TABLE_KEY_FIRST_LETTER = "first_letter";
     private static final String WORD_CREATE_TABLE = "CREATE TABLE " + WORD_TABLE_NAME + " (" +
             WORD_TABLE_KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            WORD_TABLE_KEY_WORD + " TEXT UNIQUE, " +
+            WORD_TABLE_KEY_WORD + " TEXT, " +
             WORD_TABLE_KEY_FIRST_LETTER + " CHARACTER(1), " +
             WORD_TABLE_KEY_DEFINITION + " TEXT); ";
 

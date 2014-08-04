@@ -13,6 +13,9 @@
     <string name="create_word_destroy">Remove</string>
     <string name="action_create_save">Save</string>
     <string name="title_activity_acronym_settings">AcronymSettings</string>
-    <string name="settings_api_key_hint">Enter Merriam Webster Api Key</string>
+    <string name="settings_api_key_hint">Enter Wordnik Api Key</string>
+    <string name="word_def_select_title">Select a Definition</string>
+    <string name="word_def_select_custom">Enter your own definition</string>
+    <string name="word_def_select_done">Done</string>
 
 </resources>
